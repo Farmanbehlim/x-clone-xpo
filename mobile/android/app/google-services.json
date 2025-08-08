@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "970759436666",
+    "project_id": "xclone-9776c",
+    "storage_bucket": "xclone-9776c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:970759436666:android:607615cf5cd0945f0dbec3",
+        "android_client_info": {
+          "package_name": "com.xclone.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxfIBk31q247ocG1-hpu7f_d2YqvHy-7M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
