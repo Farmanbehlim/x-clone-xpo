@@ -17,7 +17,7 @@ export const useComments = (postId: string) => {
     mutationFn: async ({ postId, content }: { postId: string; content: string }) => {
       const response = await commentApi.createComment(api, postId, content);
       // console.log(response,'gvygvcygdvcygvdscfv')
-      return response.data;
+      return response.data; 
     },
     onSuccess: (newcomment) => {
       console.log(newcomment, 'newcomment')
