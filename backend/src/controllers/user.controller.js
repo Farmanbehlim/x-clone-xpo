@@ -42,14 +42,17 @@ export const syncUser = asyncHandler(async (req, res) => {
   const userData = {
     clerkId: userId,
     email: clerkUser.emailAddresses[0].emailAddress,
-    firstName: clerkUser.firstName || "dydgyg",
-    lastName: clerkUser.lastName || "uydggd",
+    firstName: clerkUser.firstName || "",
+    lastName: clerkUser.lastName || "",
     username: clerkUser.emailAddresses[0].emailAddress.split("@")[0],
     profilePicture: clerkUser.imageUrl || "",
   };
+  const metaData = {
+    code: 200
+  }
 
   const user = await User.create(userData);
-  res.status(201).json({ user, message: "User created successfully" });
+  res.status(201).json({ user, metaData, message: "User created successfully" });
 });
 
 export const getCurrentUser = asyncHandler(async (req, res) => {
@@ -59,7 +62,7 @@ export const getCurrentUser = asyncHandler(async (req, res) => {
   const user = await User.findOne({ clerkId: userId });
 
   if (!user) return res.status(404).json({ error: "User not found" });
- 
+
   return res.status(200).json({ user });
 });
 
@@ -69,20 +72,20 @@ export const getAllUser = asyncHandler(async (req, res) => {
   const USERS_PER_PAGE = 10;
   const pageNumber = page || 1;
 
-  console.log(search,'n')
+  console.log(search, 'n')
   //calculate documents to skip
   const skip = (pageNumber - 1) * USERS_PER_PAGE;
   const searchQuery = search ? {
     $or: [
       { firstName: { $regex: search, $options: 'i' } },
       { lastName: { $regex: search, $options: 'i' } }
-    ] 
-  } : {} 
+    ]
+  } : {}
 
   //Get the total counts of matching users
   const totalUsers = await User.countDocuments(searchQuery)
   const users = await User.find(searchQuery).select('-pushTokens').skip(skip).limit(USERS_PER_PAGE);
-  console.log(users,'hbyb');
+  console.log(users, 'hbyb');
   if (!users || users.length === 0) {
     return res.status(404).json({ error: "All user details not found" });
   }

@@ -1,15 +1,5 @@
 
 
-
-
-
-
-
-
-
-
-
-
 import { create } from 'zustand';
 
 interface PushTokenState {

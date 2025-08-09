@@ -47,9 +47,9 @@ import { Platform } from "react-native";
 
 // ✅ Local network IP for physical device testing
 
-const API_BASE_URL="http://10.144.74.37:5001/api"
-// console.log(API_BASE_URL,"hydytvdytvtdvtv")
-// const API_BASE_URL = "https://x-clone-xpos.vercel.app/api"
+// const API_BASE_URL="http://10.144.74.37:5001/api"
+// // console.log(API_BASE_URL,"hydytvdytvtdvtv")https://x-clone-xpo.vercel.app/
+const API_BASE_URL = "https://x-clone-xpo.vercel.app/api"
 // ✅ This creates an Axios instance that auto-adds the Clerk token
 export const createApiClient = (
     getToken: (opts?: { template?: string }) => Promise<string | null>
