@@ -170,17 +170,14 @@ const likePostMutation = useMutation({
 
       });
 
-      // Optionally still invalidate other queries
-      // queryClient.invalidateQueries({ queryKey: ["posts"] });
-      // if (username) {
-      //   queryClient.invalidateQueries({ queryKey: ["userPosts", username] });
-      // }
+      
     },
   });
 
   const checkIsLiked = (postLikes: string[], currentUser: any) => {
     // console.log(currentUser,"hbcygv")
-    const isLiked = currentUser && postLikes.includes(currentUser[0]?._id);
+    // console.log(postLikes,'p')
+    const isLiked = currentUser && postLikes.includes(currentUser);
     // console.log(isLiked)
     return isLiked;
   };

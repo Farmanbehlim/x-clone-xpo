@@ -26,6 +26,8 @@ export const HomeScreen = () => {
     const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
     
     
+    const { error, refetch, toggleLike, deletePost, checkIsLiked, isDeletingPost } =
+        usePosts();
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading
     } = useAllPosts();
     
@@ -54,8 +56,6 @@ export const HomeScreen = () => {
     : null;
     console.log(selectedPost,'selectedPostlll')
 
-    const { error, refetch, toggleLike, deletePost, checkIsLiked, isDeletingPost } =
-        usePosts();
     // const handleComment = useCallback((postId: string) => {
     //     setSelectedPostId(postId);
     // }, []);
@@ -69,7 +69,7 @@ export const HomeScreen = () => {
 
 
     const renderItem = useCallback(({ item }: { item: PostItem }) => {
-        const isLiked = checkIsLiked(item.likes, currentUser?._id); // Pass user ID instead of full object c
+        const isLiked = checkIsLiked(item?.likes, currentUser?._id); // Pass user ID instead of full object c
         console.log("renderItem")
         return (
             <PostCard

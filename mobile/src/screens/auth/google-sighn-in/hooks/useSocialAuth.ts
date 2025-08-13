@@ -26,6 +26,7 @@ export const useSocialAuth = () => {
       if (createdSessionId && setActive) {
         await setActive({ session: createdSessionId });
 
+        
 
         navigation.dispatch(
           CommonActions.reset({

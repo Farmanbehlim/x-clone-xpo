@@ -47,13 +47,13 @@ import { Platform } from "react-native";
 
 // ✅ Local network IP for physical device testing
 
-const API_BASE_URL="http://10.98.109.37:5001/api"
+const API_BASE_URL="http://10.98.109.37:5001/api" 
 // // console.log(API_BASE_URL,"hydytvdytvtdvtv")https://x-clone-xpo.vercel.app/
 // const API_BASE_URL = "https://x-clone-xpo.vercel.app/api"
 // ✅ This creates an Axios instance that auto-adds the Clerk token
 export const createApiClient = (
     getToken: (opts?: { template?: string }) => Promise<string | null>
-): AxiosInstance => {
+): AxiosInstance => { 
     const api = axios.create({ baseURL: API_BASE_URL });
 
     api.interceptors.request.use(async (config) => {
@@ -90,7 +90,7 @@ export const postApi = {
         api.post("/posts", data),
     getPosts: (api: AxiosInstance) => api.get("/posts"),
     getUserPosts: (api: AxiosInstance, username: string) => api.get(`/posts/user/${username}`),
-    likePost: (api: AxiosInstance, postId: string) => api.post(`/posts/like?postid=${postId}`),
+    likePost: (api: AxiosInstance, postId: string) => api.post(`/posts/like?postId=${postId}`),
     deletePost: (api: AxiosInstance, postId: string) => api.delete(`/posts/${postId}`),
     getAllUserPost:(api:AxiosInstance,pageparam:number)=>api.get(`/posts?page=${pageparam}`),
     getMainUserPost:(api:AxiosInstance,pageparam:number,userId:string)=>api.get(`/posts/getSingleUserAllPost?user=${userId}&page=${pageparam}`),
