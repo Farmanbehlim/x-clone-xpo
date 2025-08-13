@@ -7,7 +7,12 @@ import cloudinary from "../config/cloudinary.js";
 import likeCache from "../utils/nodecache.js";
 import Notification from "../models/notification.model.js";
 import Comment from "../models/comment.model.js";
+
 import { sendPushNotification } from "../utils/notification.js";
+import { redis, toggleLikeLua } from "../utils/redisClient.js";
+
+
+
 
 export const getPosts = asyncHandler(async (req, res) => {
 
@@ -185,51 +190,118 @@ export const createPost = asyncHandler(async (req, res) => {
 
 
 
+// export const likePost = asyncHandler(async (req, res) => {
+//   const { userId } = getAuth(req);
+//   const { postId } = req.query;
+//    console.log(postId,'kji') 
+//   const user = await User.findOne({ clerkId: userId }).select("_id username").lean();
+//   if (!user) return res.status(404).json({ error: "User not found" });
+
+//   // 🔹 Check cache for current like state
+//   const cacheKey = `${postId}:${user._id}`;
+//   let cachedLikeState = likeCache.get(cacheKey);
+
+//   if (cachedLikeState !== undefined) {
+//     // User is toggling quickly → skip DB call, just toggle cache
+//     cachedLikeState = !cachedLikeState;
+//     likeCache.set(cacheKey, cachedLikeState);
+//     res.status(200).json({ like: cachedLikeState });
+//     return;
+//   }
+
+//   // 🔹 Query DB only if not cached
+//   const likeResult = await Post.updateOne(
+//     { _id: postId, likes: { $ne: user._id } }, // only add if not already liked
+//     { $addToSet: { likes: user._id } }
+//   );
+
+//   let isLiked;
+//   if (likeResult.modifiedCount > 0) {
+//     isLiked = true; // Post was liked
+//   } else {
+//     await Post.updateOne(
+//       { _id: postId },
+//       { $pull: { likes: user._id } }
+//     );
+//     isLiked = false;
+//   }
+
+//   // 🔹 Store state in cache for faster subsequent toggles
+//   likeCache.set(cacheKey, isLiked);
+
+//   res.status(200).json({ like: isLiked });
+
+//   // 🔹 Background notification if liked & not self-like
+//   if (isLiked) { 
+//     setImmediate(async () => {
+//       try {
+//         const post = await Post.findById(postId).select("user").lean();
+//         if (post && post.user.toString() !== user._id.toString()) {
+//           await Notification.create({
+//             from: user._id,
+//             to: post.user,
+//             type: "like",
+//             post: postId,
+//           });
+
+//           const recipient = await User.findById(post.user)
+//             .select("pushTokens username")
+//             .lean();
+
+//           if (recipient) {
+//             await sendPushNotification(
+//               recipient,
+//               "New Like",
+//               `${user.username} liked your post`,
+//               {
+//                 type: "like",
+//                 postId,
+//                 userId: user._id,
+//                 screen: "Notifications",
+//               }
+//             );
+//           }
+//         }
+//       } catch (err) {
+//         console.error("Notification error:", err);
+//       }
+//     });
+//   }
+// });
+
+
+
+
 export const likePost = asyncHandler(async (req, res) => {
   const { userId } = getAuth(req);
-  const { postId } = req.params;
+  const { postId } = req.query; // ✅ Now from query instead of params
 
-  const user = await User.findOne({ clerkId: userId }).select("_id username").lean();
+  if (!postId) {
+    return res.status(400).json({ error: "postId query parameter is required" });
+  }
+
+  const user = await User.findOne({ clerkId: userId })
+    .select("_id username")
+    .lean();
   if (!user) return res.status(404).json({ error: "User not found" });
 
-  // 🔹 Check cache for current like state
-  const cacheKey = `${postId}:${user._id}`;
-  let cachedLikeState = likeCache.get(cacheKey);
+  const redisKey = `post:${postId}:likes`;
 
-  if (cachedLikeState !== undefined) {
-    // User is toggling quickly → skip DB call, just toggle cache
-    cachedLikeState = !cachedLikeState;
-    likeCache.set(cacheKey, cachedLikeState);
-    res.status(200).json({ like: cachedLikeState });
-    return;
-  }
+  // Run atomic toggle in Redis
+  const isLiked = await redis.eval(toggleLikeLua, 1, redisKey, user._id.toString());
 
-  // 🔹 Query DB only if not cached
-  const likeResult = await Post.updateOne(
-    { _id: postId, likes: { $ne: user._id } }, // only add if not already liked
-    { $addToSet: { likes: user._id } }
-  );
+  res.status(200).json({ like: Boolean(isLiked) });
 
-  let isLiked;
-  if (likeResult.modifiedCount > 0) {
-    isLiked = true; // Post was liked
-  } else {
-    await Post.updateOne(
-      { _id: postId },
-      { $pull: { likes: user._id } }
-    );
-    isLiked = false;
-  }
+  // Background Mongo update + notification
+  setImmediate(async () => {
+    try {
+      if (isLiked) {
+        await Post.updateOne({ _id: postId }, { $addToSet: { likes: user._id } });
+      } else {
+        await Post.updateOne({ _id: postId }, { $pull: { likes: user._id } });
+      }
 
-  // 🔹 Store state in cache for faster subsequent toggles
-  likeCache.set(cacheKey, isLiked);
-
-  res.status(200).json({ like: isLiked });
-
-  // 🔹 Background notification if liked & not self-like
-  if (isLiked) {
-    setImmediate(async () => {
-      try {
+      if (isLiked) {
         const post = await Post.findById(postId).select("user").lean();
         if (post && post.user.toString() !== user._id.toString()) {
           await Notification.create({
@@ -257,16 +329,12 @@ export const likePost = asyncHandler(async (req, res) => {
             );
           }
         }
-      } catch (err) {
-        console.error("Notification error:", err);
       }
-    });
-  }
+    } catch (err) {
+      console.error("Mongo write/notification error:", err);
+    }
+  });
 });
-
-
-
-
 
 
 
