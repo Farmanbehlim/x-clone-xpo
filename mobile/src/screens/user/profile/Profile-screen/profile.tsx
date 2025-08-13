@@ -10,10 +10,10 @@ import {
 
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useCallback, useMemo, useState } from "react";
-import { PostItem } from "../../Home/Home-screen/types";
+import { PostItem } from "../../home/home-screen/types";
 import { usePosts } from "@/src/hooks/usePosts";
 import { PostCard } from "@/src/component/PostCard";
-import { useAllPosts } from "../../Home/Home-screen/hooks/useAllPosts";
+import { useAllPosts } from "../../home/home-screen/hooks/useAllPosts";
 import { CommentsModal } from "@/src/component/CommentsModel";
 import { MainUserPostscard } from "../ui/MainUserPostsCard";
 import { useMainUserAllPost } from "../hooks/useMainUserAllPosts";
@@ -61,7 +61,7 @@ const ProfileScreens = () => {
         console.log("renderItem")
         return (
             <MainUserPostscard
-                post={item}
+                post={item} 
                 onLike={toggleLike}
                 onDelete={deletePost}
                 onComment={() => setSelectedPostId(item?._id)}

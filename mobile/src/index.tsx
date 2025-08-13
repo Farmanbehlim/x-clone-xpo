@@ -11,19 +11,21 @@ import { registerForPushNotifications } from "@/utils/registerForPushNotificatio
 import { usePushTokenStore } from "./store/use-registerToken-store";
 import { NavigationContainerRef } from "@react-navigation/native";
 import { RootTabParamList } from "./navigations/type";
-
+import { useUserAuthStore } from "./store/use-Auth-store";
 const queryClient = new QueryClient();
 const PUBLISHABLE_KEY = "pk_test_Y2hhcm1pbmctcGFycm90LTk2LmNsZXJrLmFjY291bnRzLmRldiQ"
 export default function App() {
   const navigationRef = useRef<NavigationContainerRef<RootTabParamList>>(null);
- 
-  
+
+
+  // console.log(hasSynced,"teefcefcefc")
+  // const hasSynced = useUserAuthStore.getState().hasSynced;
   useEffect(() => {
     // console.log(registerForPushNotifications())
     const register = async () => {
       try {
         const token = await registerForPushNotifications();
-        if (token?.data) {
+        if ( token?.data) {
 
           usePushTokenStore.getState().setPushToken(token?.data)
         }
@@ -46,9 +48,9 @@ export default function App() {
       console.log('Notification tapped:', data);
       if (data) {
         navigationRef.current?.navigate("Notifications");
-       
+
       }
-      
+
     });
 
     return () => {

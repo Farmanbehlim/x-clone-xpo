@@ -3,7 +3,8 @@ import { formatDate, formatNumber } from "@/utils/formatters";
 import { AntDesign, Feather } from "@expo/vector-icons";
 import React, { memo } from "react";
 import { View, Text, Alert, Image, TouchableOpacity, ActivityIndicator } from "react-native";
-import { PostItem, PostsResponse, User } from "../screens/user/Home/Home-screen/types/index";
+import { PostItem, PostsResponse, User } from "../screens/user/home/home-screen/types/index";
+import { usePosts } from "../hooks/usePosts";
 
 interface PostCardProps {
   post: PostItem;
@@ -16,6 +17,7 @@ interface PostCardProps {
 }
 
 export const PostCard = React.memo(({ post, onLike, isLiked, onDelete, onComment, currentUser, isDeletingPost }: PostCardProps) => {
+  // const{}=usePosts(post?._id)
 
   const isOwnPost = post.user?._id === currentUser?._id;
   console.log("rendering comment")

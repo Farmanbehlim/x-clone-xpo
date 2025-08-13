@@ -19,19 +19,17 @@ import { PostCard } from '@/src/component/PostCard'
 import { SignOutButton } from '@/src/component/SignOutButton'
 
 // const MemoizedPostCard = memo(PostCard);
-const HomeScreen = () => {
+export const HomeScreen = () => {
 
     useUserSync()
     const { currentUser } = useCurrentUser();
-    const { error, refetch, toggleLike, deletePost, checkIsLiked, isDeletingPost } =
-        usePosts();
     const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
-
-
+    
+    
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading
     } = useAllPosts();
-
-
+    
+    
     const posts = useMemo(() => {
         const postData = data?.pages.flatMap(page => page.posts) ?? []
         const seenIds = new Set();
@@ -43,7 +41,7 @@ const HomeScreen = () => {
             return true;
         })
     }, [data])
-
+    
     console.log(posts, 'p')
     //     const id = posts?.map((id) => id?._id)
     //   console.log(id)
@@ -52,8 +50,12 @@ const HomeScreen = () => {
     // const selectedPost = selectedPostId ? posts?.find((p: PostItem) => p?._id === selectedPostId) : null;
     // console.log(posts, 'jnndh')
     const selectedPost = selectedPostId
-        ? posts.find((p: PostItem) => p._id === selectedPostId) || null
-        : null;
+    ? posts.find((p: PostItem) => p._id === selectedPostId) || null
+    : null;
+    console.log(selectedPost,'selectedPostlll')
+
+    const { error, refetch, toggleLike, deletePost, checkIsLiked, isDeletingPost } =
+        usePosts();
     // const handleComment = useCallback((postId: string) => {
     //     setSelectedPostId(postId);
     // }, []);
@@ -118,4 +120,3 @@ const HomeScreen = () => {
     )
 }
 
-export default HomeScreen

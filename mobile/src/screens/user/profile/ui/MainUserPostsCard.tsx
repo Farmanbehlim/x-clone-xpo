@@ -3,7 +3,7 @@ import { formatDate, formatNumber } from "@/utils/formatters";
 import { AntDesign, Feather } from "@expo/vector-icons";
 import React, { memo } from "react";
 import { View, Text, Alert, Image, TouchableOpacity, ActivityIndicator } from "react-native";
-import { PostsResponse, User,PostItem } from "../../Home/Home-screen/types";
+import { PostsResponse, User,PostItem } from "../../home/home-screen/types";
 
 
 interface PostCardProps {

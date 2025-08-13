@@ -6,21 +6,6 @@ import { useApiClient } from "../api/api";
 import { useMutation } from "@tanstack/react-query"
 
 
-// export const useRemovePushToken = () => {
-//   const api = useApiClient();
-
-//   return useMutation({
-//       mutationFn: async () => {
-//         console.log("jhbxbg")
-//       await api.post('/users/remove-push-token');
-
-//     },
-//     // Optional: Add error handling if needed
-//     onError: (error) => console.error("Push token removal failed", error),
-//   });
-// };
-
-
 
 export const usePushNotification = () => {
     const api = useApiClient()

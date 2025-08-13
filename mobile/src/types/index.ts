@@ -1,9 +1,9 @@
 export interface User {
-  _id: string;
-  username: string;
-  firstName: string;
-  lastName: string;
-  profilePicture?: string;
+  _id: string | null;
+  username: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  profilePicture?: string | null;
 }
 
 export interface Comment {

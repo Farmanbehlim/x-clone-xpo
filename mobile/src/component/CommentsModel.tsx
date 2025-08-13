@@ -13,10 +13,10 @@ import {
   FlatList,
   ListRenderItem
 } from "react-native";
-import { PostItem } from "../screens/user/Home/Home-screen/types";
+import { PostItem } from "../screens/user/home/home-screen/types";
 import { useCallback, useMemo } from "react";
-import { useGetComments } from "../screens/user/Home/Home-screen/hooks/useGetComments";
-import { Comment } from "../screens/user/Home/Home-screen/types/getcomment-type";
+import { useGetComments } from "../screens/user/home/home-screen/hooks/useGetComments";
+import { Comment } from "../screens/user/home/home-screen/types";
 
 
 interface CommentsModalProps {
@@ -29,6 +29,7 @@ export const CommentsModal = React.memo(({ selectedPost, onClose }: CommentsModa
   const { currentUser } = useCurrentUser();
 
   const selectedPostId = useMemo(() => selectedPost?._id, [selectedPost?._id]);
+
   const { commentText, setCommentText, createComment, isCreatingComment } = useComments(selectedPostId as string);
 
   const { data, hasNextPage, fetchNextPage, isFetchingNextPage, isLoading } = useGetComments(selectedPostId as string);

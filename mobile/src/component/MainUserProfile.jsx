@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 
 import { useProfile } from "../hooks/useProfile"
@@ -27,6 +27,12 @@ export const MainUserProfile = React.memo(() => {
         isUpdating,
         refetch: refetchProfile,
     } = useProfile();
+
+    if (isLoading) {
+        return (
+            <ActivityIndicator />
+        )
+    }
     return (
         <View >
 
@@ -37,7 +43,7 @@ export const MainUserProfile = React.memo(() => {
                     </Text>
                     <Text className="text-gray-500 text-sm">{userPosts.length} Posts</Text>
                 </View>
-                <SignOutButton/>
+                <SignOutButton />
             </View>
 
             <View
@@ -57,7 +63,7 @@ export const MainUserProfile = React.memo(() => {
             >
                 <Image
                     source={{
-                        uri: 
+                        uri:
                             currentUser?.bannerImage ||
                             "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop",
                     }}
@@ -100,7 +106,7 @@ export const MainUserProfile = React.memo(() => {
                         <View className="flex-row items-center mb-3">
                             <Feather name="calendar" size={16} color="#657786" />
                             <Text className="text-gray-500 ml-2">
-                                
+
                                 {currentUser?.createdAt ? format(new Date(currentUser?.createdAt), "MMMM yyyy") : "Unknown"}
                             </Text>
                         </View>

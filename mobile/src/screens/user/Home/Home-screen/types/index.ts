@@ -50,10 +50,10 @@
 // types.ts
 export interface User {
   _id: string;
-  username: string;
-  firstName: string;
-  lastName: string;
-  profilePicture?: string;
+  username: string ;
+  firstName: string ;
+  lastName: string ;
+  profilePicture?: string ;
 }
 export interface Comment {
   _id: string;
@@ -70,13 +70,13 @@ export interface PostItem {
   user: User;
   likes: string[];
   comments: Comment[];
- 
+
 }
 
 export interface PostsResponse {
   posts: PostItem[];      // Array of actual post items
   pagination: Pagination; // Pagination metadata
- 
+
 }
 
 interface Pagination {

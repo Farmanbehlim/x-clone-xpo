@@ -1,9 +1,10 @@
 import asyncHandler from "express-async-handler";
 import Post from "../models/post.model.js";
 import User from "../models/user.model.js";
+import Like from "../models/like.model.js";
 import { getAuth } from "@clerk/express";
 import cloudinary from "../config/cloudinary.js";
-
+import likeCache from "../utils/nodecache.js";
 import Notification from "../models/notification.model.js";
 import Comment from "../models/comment.model.js";
 import { sendPushNotification } from "../utils/notification.js";
@@ -17,6 +18,7 @@ export const getPosts = asyncHandler(async (req, res) => {
   console.log(pageNumber, 'cjncj')
   //  const pageNumber = Math.max(1, parseInt(page)) || 1;
   const skip = (pageNumber - 1) * POST_PER_PAGE;
+
   const posts = await Post.find()
     .sort({ createdAt: -1 })
     .populate("user", "username firstName lastName profilePicture")
@@ -66,7 +68,8 @@ export const getSingleUserAllPost = asyncHandler(async (req, res) => {
         select: "username firstName lastName profilePicture",
       },
     }
-    ).skip(skip).limit(POST_PER_PAGE)
+    ).skip(skip).limit(POST_PER_PAGE);
+
   const totalPosts = await Post.countDocuments();
   if (!posts || posts.length === 0) {
     return res.status(404).json({
@@ -78,17 +81,19 @@ export const getSingleUserAllPost = asyncHandler(async (req, res) => {
 
   if (!posts) return res.status(404).json({ error: "Post not found" });
 
-  res.status(200).json({ posts ,
-     pagination: {
+  res.status(200).json({
+    posts,
+    pagination: {
       totalPosts,
       totalPages: totalPages,
       currentPage: pageNumber,
       usersPerPage: POST_PER_PAGE,
       hasNextPage: pageNumber < totalPages,
       hasPreviousPage: pageNumber > 1
-    }});
-// console.log(post)
-}) 
+    }
+  });
+  // console.log(post)
+})
 
 export const getPost = asyncHandler(async (req, res) => {
   const { postId } = req.params;
@@ -175,62 +180,103 @@ export const createPost = asyncHandler(async (req, res) => {
   res.status(201).json({ post });
 });
 
+
+
+
+
+
 export const likePost = asyncHandler(async (req, res) => {
   const { userId } = getAuth(req);
   const { postId } = req.params;
 
-  const user = await User.findOne({ clerkId: userId });
-  const post = await Post.findById(postId);
+  const user = await User.findOne({ clerkId: userId }).select("_id username").lean();
+  if (!user) return res.status(404).json({ error: "User not found" });
 
-  if (!user || !post) return res.status(404).json({ error: "User or post not found" });
+  // 🔹 Check cache for current like state
+  const cacheKey = `${postId}:${user._id}`;
+  let cachedLikeState = likeCache.get(cacheKey);
 
-  const isLiked = post.likes.includes(user._id);
-  console.log(isLiked, 'islike')
-  if (isLiked) {
-    // unlike
-    await Post.findByIdAndUpdate(postId, {
-      $pull: { likes: user._id },
-    });
-  } else if (!isLiked) {
-    // like
-    await Post.findByIdAndUpdate(postId, {
-      $push: { likes: user._id },
-    });
-
-    // create notification if not liking own post
-    if (post.user.toString() !== user._id.toString()) {
-      await Notification.create({
-        from: user._id,
-        to: post.user,
-        type: "like",
-        post: postId,
-      });
-      // Fetch recipient with push tokens
-      const recipient = await User.findById(post.user).select('pushTokens username');
-
-      if (recipient) {
-        await sendPushNotification(
-          recipient,
-          "New Like",
-          `${user.username} liked your post`,
-          {
-            type: "like",
-            postId,
-            userId: user._id,
-            screen: "Notifications"
-          }
-        );
-      }
-    }
-
+  if (cachedLikeState !== undefined) {
+    // User is toggling quickly → skip DB call, just toggle cache
+    cachedLikeState = !cachedLikeState;
+    likeCache.set(cacheKey, cachedLikeState);
+    res.status(200).json({ like: cachedLikeState });
+    return;
   }
 
-  console.log(isLiked)
-  res.status(200).json({
-    like: isLiked,
-    // message: isLiked ? "Post unliked successfully" : "Post liked successfully",
-  });
+  // 🔹 Query DB only if not cached
+  const likeResult = await Post.updateOne(
+    { _id: postId, likes: { $ne: user._id } }, // only add if not already liked
+    { $addToSet: { likes: user._id } }
+  );
+
+  let isLiked;
+  if (likeResult.modifiedCount > 0) {
+    isLiked = true; // Post was liked
+  } else {
+    await Post.updateOne(
+      { _id: postId },
+      { $pull: { likes: user._id } }
+    );
+    isLiked = false;
+  }
+
+  // 🔹 Store state in cache for faster subsequent toggles
+  likeCache.set(cacheKey, isLiked);
+
+  res.status(200).json({ like: isLiked });
+
+  // 🔹 Background notification if liked & not self-like
+  if (isLiked) {
+    setImmediate(async () => {
+      try {
+        const post = await Post.findById(postId).select("user").lean();
+        if (post && post.user.toString() !== user._id.toString()) {
+          await Notification.create({
+            from: user._id,
+            to: post.user,
+            type: "like",
+            post: postId,
+          });
+
+          const recipient = await User.findById(post.user)
+            .select("pushTokens username")
+            .lean();
+
+          if (recipient) {
+            await sendPushNotification(
+              recipient,
+              "New Like",
+              `${user.username} liked your post`,
+              {
+                type: "like",
+                postId,
+                userId: user._id,
+                screen: "Notifications",
+              }
+            );
+          }
+        }
+      } catch (err) {
+        console.error("Notification error:", err);
+      }
+    });
+  }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 export const deletePost = asyncHandler(async (req, res) => {
   const { userId } = getAuth(req);
@@ -253,3 +299,92 @@ export const deletePost = asyncHandler(async (req, res) => {
 
   res.status(200).json({ message: "Post deleted successfully" });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// export const likePost = asyncHandler(async (req, res) => {
+//   console.log("like")
+//   const { userId } = getAuth(req);
+//   const { postId } = req.params;
+
+//   const user = await User.findOne({ clerkId: userId });
+//   const post = await Post.findById(postId);
+
+//   if (!user || !post) {
+//     return res.status(404).json({ error: "User or post not found" });
+//   }
+
+//   // Check if like exists
+//   const existingLike = await Like.findOne({
+//     user: user._id,
+//     post: postId
+//   });
+  
+
+//   if (existingLike) {
+//     // Unlike: Remove the like document
+//     await Like.findByIdAndDelete(existingLike._id);
+
+//   } else {
+//     // Like: Create new like document
+//     const newLike = await Like.create({
+//       user: user._id,
+//       post: postId
+//     });
+
+//     // Create notification if not liking own post
+//     if (post.user.toString() !== user._id.toString()) {
+//       await Notification.create({
+//         from: user._id,
+//         to: post.user,
+//         type: "like",
+//         post: postId,
+//       });
+
+//       const recipient = await User.findById(post.user).select('pushTokens username');
+//       if (recipient) {
+//         await sendPushNotification(
+//           recipient,
+//           "New Like",
+//           `${user.username} liked your post`,
+//           {
+//             type: "like",
+//             postId,
+//             userId: user._id,
+//             screen: "Notifications"
+//           }
+//         );
+//       }
+//     }
+//   }
+//   const likeCount = await Like.countDocuments({ post: postId });
+//   await Post.findByIdAndUpdate(
+//     postId,
+//     { likeCount },
+//     { new: true } // optional: returns the updated doc if needed
+//   );
+
+//   res.status(200).json({
+//     like: !existingLike, // true if liked, false if unliked
+//     likeCount
+//   });
+//   console.log(ex);
+//   console.log(likeCount)
+// });

@@ -2,7 +2,7 @@
 import { useInfiniteQuery, QueryFunctionContext, UseInfiniteQueryResult, InfiniteData } from '@tanstack/react-query';
 // import { APIResponse } from '../types';
 import { postApi, useApiClient, userApi } from '@/src/api/api';
-import { PostsResponse } from '../../Home/Home-screen/types';
+import { PostsResponse } from '../../home/home-screen/types';
 import { useCurrentUser } from '@/src/hooks/useCurrentUser';
 
 

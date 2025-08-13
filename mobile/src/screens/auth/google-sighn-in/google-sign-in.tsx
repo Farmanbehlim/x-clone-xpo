@@ -5,7 +5,7 @@ import { ActivityIndicator, Image, Text, TouchableOpacity, View } from "react-na
 
 export default function GoogleSignInScreen() {
   
-  const { handleSocialAuth, isLoading } = useSocialAuth();
+  const { handleSocialAuth, isLoadingG ,isLoadingA} = useSocialAuth();
 
   return (
     <View className="flex-1 bg-white">
@@ -25,8 +25,8 @@ export default function GoogleSignInScreen() {
             <TouchableOpacity
               className="flex-row items-center justify-center bg-white border border-gray-300 rounded-full py-3 px-6"
               onPress={() => handleSocialAuth("oauth_google")}
-              disabled={isLoading}
-              style={{
+              disabled={isLoadingG||isLoadingA}
+              style={{ 
                 shadowColor: "#000",
                 shadowOffset: { width: 0, height: 1 },
                 shadowOpacity: 0.1,
@@ -34,7 +34,7 @@ export default function GoogleSignInScreen() {
                 elevation: 2,
               }}
             >
-              {isLoading ? (
+              {isLoadingG ? (
                 <ActivityIndicator size="small" color="#4285F4" />
               ) : (
                 <View className="flex-row items-center justify-center">
@@ -52,7 +52,7 @@ export default function GoogleSignInScreen() {
             <TouchableOpacity
               className="flex-row items-center justify-center bg-white border border-gray-300 rounded-full py-3 px-6"
               onPress={() => handleSocialAuth("oauth_apple")}
-              disabled={isLoading}
+              disabled={isLoadingG}
               style={{
                 shadowColor: "#000",
                 shadowOffset: { width: 0, height: 1 },
@@ -61,7 +61,7 @@ export default function GoogleSignInScreen() {
                 elevation: 2,
               }}
             >
-              {isLoading ? (
+              {isLoadingA ? (
                 <ActivityIndicator size="small" color="#000" />
               ) : (
                 <View className="flex-row items-center justify-center">
@@ -86,6 +86,6 @@ export default function GoogleSignInScreen() {
           </Text>
         </View>
       </View>
-    </View>
+    </View> 
   );
 }

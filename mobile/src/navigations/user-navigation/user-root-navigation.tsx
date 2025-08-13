@@ -2,12 +2,13 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Feather } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { View, Text } from 'react-native';
-import HomeScreen from '@/src/screens/user/Home/Home-screen/Home-screen';
+// import {HomeScreen} from '@/src/screens/user/home/home-screen/home-screen';
 import NotificationsScreen from '@/src/screens/user/notifications/notifications';
 // import ProfileScreens from '@/src/screens/user/profile/Profile-screen/profile';
 import SearchScreen from '@/src/screens/user/search/search-screen/search-screen';
 import {  RootTabParamList } from '../type';
-import ProfileScreens from '@/src/screens/user/profile/Profile-screen/profile';
+import ProfileScreens from '@/src/screens/user/profile/profile-screen/profile';
+import { HomeScreen } from '@/src/screens/user/home/home-screen/homescreen';
 
 // Create placeholder screens (replace with your actual components)
 
@@ -15,11 +16,11 @@ import ProfileScreens from '@/src/screens/user/profile/Profile-screen/profile';
 //   <View><Text>profilescreen</Text></View>
 // );
 const MessagesScreen = () => (
-  <View><Text>Home</Text></View>
+  <View><Text>upcoming soon</Text></View>
 );
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
-const UserRootNavigator = () => {
+export const UserRootNavigator = () => {
   type TabBarIconProps = {
     color: string;
     size: number;
@@ -92,4 +93,3 @@ const UserRootNavigator = () => {
 
 
 
-export default UserRootNavigator;

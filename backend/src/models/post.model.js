@@ -21,6 +21,14 @@ const postSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
+    // likeCount: {
+    //   type: Number,
+    //   default: 0
+    // },
+    // isLike:{
+    //   type:Boolean,
+    //   default:false
+    // },
     comments: [
       {
         type: mongoose.Schema.Types.ObjectId,

@@ -6,6 +6,7 @@ import { interval } from "date-fns";
 import { useCurrentUser } from "./useCurrentUser";
 
 export const usePosts = (username?: string) => {
+  // console.log(postId,'haha')
   const api = useApiClient();
   const queryClient = useQueryClient();
   const { currentUser } = useCurrentUser();
@@ -32,46 +33,83 @@ export const usePosts = (username?: string) => {
     select: (response) => response?.data?.posts,
   });
 
-  const likePostMutation = useMutation({
-    mutationFn: (postId: string) => postApi.likePost(api, postId),
-    onSuccess: (newlike: any) => {
-      console.log(newlike?.data, 'newlike')
-      // queryClient.invalidateQueries({ queryKey: ["posts"] });
-      // if (username) {
-      // queryClient.invalidateQueries({ queryKey: ["AllUserPost"] });
-      // }
-    },
-  });
+  
+
+const likePostMutation = useMutation({
+  mutationFn: (postId: string) => postApi.likePost(api, postId),
+  onSuccess: (newlike: any, postId: string) => {
+    queryClient.setQueryData(["AllUserPost"], (oldData: any) => {
+      // if (!oldData) return oldData; // safety check
+
+      const isLiked = newlike?.data?.like; // true if user just liked the post
+
+      const updatedPages = oldData.pages?.map((page: any) => {
+        const updatedPosts = page.posts?.map((post: any) => {
+          if (post?._id === postId) {
+            if (isLiked) {
+              // ✅ Add like
+              return {
+                ...post,
+                likes: [...(post.likes || []), userId]
+              };
+            } else {
+              // ✅ Remove like
+              const updatedLikes = (post.likes || []).filter(
+                (id: string) => id !== userId
+              );
+              return {
+                ...post,
+                likes: updatedLikes
+              };
+            }
+          }
+          return post;
+        });
+        return { ...page, posts: updatedPosts };
+      });
+
+      return { ...oldData, pages: updatedPages };
+    });
+
+
+     queryClient.setQueryData(["AllMainUserPost",userId], (oldData: any) => {
+      // if (!oldData) return oldData; // safety check
+
+      const isLiked = newlike?.data?.like; // true if user just liked the post
+
+      const updatedPages = oldData.pages?.map((page: any) => {
+        const updatedPosts = page.posts?.map((post: any) => {
+          if (post?._id === postId) {
+            if (isLiked) {
+              // ✅ Add like
+              return {
+                ...post,
+                likes: [...(post.likes || []), userId]
+              };
+            } else {
+              // ✅ Remove like
+              const updatedLikes = (post.likes || []).filter(
+                (id: string) => id !== userId
+              );
+              return {
+                ...post,
+                likes: updatedLikes
+              };
+            }
+          }
+          return post;
+        });
+        return { ...page, posts: updatedPosts };
+      });
+
+      return { ...oldData, pages: updatedPages };
+    });
+  },
+});
 
 
 
-  //   const likePostMutation = useMutation({
-  //   mutationFn: (postId: string) => postApi.likePost(api, postId),
-  //   onSuccess: (updatedPost, postId) => {
-  //     queryClient.setQueryData(["AllUserPost"], (oldData: any) => {
-  //       // Handle non-paginated data (simple array)
-  //       if (Array.isArray(oldData)) {
-  //         return oldData.map(post => 
-  //           post.id === updatedPost.id ? { ...post, ...updatedPost } : post
-  //         );
-  //       }
 
-  //       // Handle paginated/infinite query data
-  //       if (oldData?.pages) {
-  //         return {
-  //           ...oldData,
-  //           pages: oldData.pages.map((page: any[]) =>
-  //             page.map(post => 
-  //               post.id === updatedPost?.id ? { ...post, ...updatedPost } : post
-  //             )
-  //           )
-  //         };
-  //       }
-
-  //       return oldData; // Return unchanged if structure unrecognized
-  //     });
-  //   },
-  // });
 
 
 

@@ -16,7 +16,7 @@ export const getNotifications = asyncHandler(async (req, res) => {
     .populate("comment", "content");
 
   res.status(200).json({ notifications });
-}); 
+});  
 
 export const deleteNotification = asyncHandler(async (req, res) => {
   const { userId } = getAuth(req);
