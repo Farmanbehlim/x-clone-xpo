@@ -47,7 +47,7 @@ import Constants from "expo-constants"
 
 // ✅ Local network IP for physical device testing 
 const API_BASE_URL = Constants.expoConfig?.extra?.API_BASE_URL;
-console.log(API_BASE_URL,"apibase")
+console.log(API_BASE_URL,"apibase")  
 // const API_BASE_URL="http://10.149.103.37:5001/api" 
 // // console.log(API_BASE_URL,"hydytvdytvtdvtv")https://x-clone-xpo.vercel.app/
 // const API_BASE_URL = "https://x-clone-xpo.vercel.app/api"

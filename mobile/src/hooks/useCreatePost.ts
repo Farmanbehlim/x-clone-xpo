@@ -74,7 +74,7 @@ export const useCreatePost = () => {
 
             })
 
-            queryClient.setQueryData(["AllMainUserPost",userId], (oldData: any) => {
+            queryClient.setQueryData(["AllMainUserPost", userId], (oldData: any) => {
 
                 console.log(oldData?.pages[0].posts, 'olddataszl');
                 const newPostData = newPost?.data?.post;
@@ -133,8 +133,8 @@ export const useCreatePost = () => {
         }
 
         const pickerOptions = {
-            //   allowsEditing: true,
-            //   aspect: [4, 3] as [number, number],
+            allowsEditing: true,
+            aspect: [4, 4] as [number, number],
             quality: 0.8,
 
         };
