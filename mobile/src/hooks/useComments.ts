@@ -17,18 +17,27 @@ export const useComments = (postId: string) => {
     mutationFn: async ({ postId, content }: { postId: string; content: string }) => {
       const response = await commentApi.createComment(api, postId, content);
       // console.log(response,'gvygvcygdvcygvdscfv')
-      return response.data; 
+      return response.data;
     },
     onSuccess: (newcomment) => {
       console.log(newcomment, 'newcomment')
       queryClient.setQueryData(["GetPostComments", postId], (oldData: any) => {
-        if (!oldData) return oldData;
-        console.log(oldData, 'oldata')
-        console.log(oldData)
+        if (!oldData) {
+          return {
+            pageParams: [1],
+            pages: [{
+              comments: [{
+                ...newcomment?.comments
+              }],
+              pagination: [undefined]
+            }]
+          }
+        }
+
 
         const firstPage = oldData?.pages[0];
 
-        console.log(firstPage, "firstPage")
+        // console.log(firstPage, "firstPage")
         const updatedFirstPage = {
           ...firstPage,
           comments: [newcomment?.comments, ...firstPage?.comments]
@@ -69,7 +78,7 @@ export const useComments = (postId: string) => {
         return { ...oldData, pages: updatedPages };
       });
 
-
+ 
 
       queryClient.setQueryData(["AllMainUserPost", userId], (oldData: any) => {
         if (!oldData) return oldData;

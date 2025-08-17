@@ -9,13 +9,13 @@ import Notification from "../models/notification.model.js";
 import Comment from "../models/comment.model.js";
 
 import { sendPushNotification } from "../utils/notification.js";
-import { redis, toggleLikeLua } from "../utils/redisClient.js";
+// import { redis, toggleLikeLua } from "../utils/redisClient.js";
 
 
 
 
 export const getPosts = asyncHandler(async (req, res) => {
-
+console.log("getPosts")
   const { page = 1 } = req.query;
 
   const POST_PER_PAGE = 5;
@@ -102,7 +102,7 @@ export const getSingleUserAllPost = asyncHandler(async (req, res) => {
 
 export const getPost = asyncHandler(async (req, res) => {
   const { postId } = req.params;
-
+console.log("getPost")
   const post = await Post.findById(postId)
     .populate("user", "username firstName lastName profilePicture")
     .populate({
@@ -120,7 +120,7 @@ export const getPost = asyncHandler(async (req, res) => {
 
 export const getUserPosts = asyncHandler(async (req, res) => {
   const { username } = req.params;
-
+ console.log("getUserPosts")
   const user = await User.findOne({ username });
   if (!user) return res.status(404).json({ error: "User not found" });
 
@@ -139,6 +139,7 @@ export const getUserPosts = asyncHandler(async (req, res) => {
 });
 
 export const createPost = asyncHandler(async (req, res) => {
+  console.log("creaetPost")
   const { userId } = getAuth(req);
   const { content } = req.body;
   const imageFile = req.file;
@@ -347,6 +348,7 @@ export const likePost = asyncHandler(async (req, res) => {
 
 
 export const deletePost = asyncHandler(async (req, res) => {
+  console.log("detetepost")
   const { userId } = getAuth(req);
   const { postId } = req.params;
 

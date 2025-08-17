@@ -26,7 +26,7 @@ export const HomeScreen = () => {
     const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
     
     
-    const { error, refetch, toggleLike, deletePost, checkIsLiked, isDeletingPost } =
+    const { error, refetch, toggleLike, deletePost, checkIsLiked, isDeletingPost ,deletingPostId} =
         usePosts();
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading
     } = useAllPosts();
@@ -80,6 +80,7 @@ export const HomeScreen = () => {
                 currentUser={currentUser} // Pass only needed ID
                 isLiked={isLiked}
                 isDeletingPost={isDeletingPost}
+                deletingPostId={deletingPostId}
             />
         );
     }, [toggleLike, deletePost, currentUser, checkIsLiked]);

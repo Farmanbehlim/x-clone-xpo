@@ -1,10 +1,10 @@
 // import { Post, User } from "../types/index";
 import { formatDate, formatNumber } from "@/utils/formatters";
 import { AntDesign, Feather } from "@expo/vector-icons";
-import React, { memo } from "react";
+import React from "react";
 import { View, Text, Alert, Image, TouchableOpacity, ActivityIndicator } from "react-native";
-import { PostItem, PostsResponse, User } from "../screens/user/home/home-screen/types/index";
-import { usePosts } from "../hooks/usePosts";
+import { PostItem, User } from "../screens/user/home/home-screen/types/index";
+
 
 interface PostCardProps {
   post: PostItem;
@@ -14,11 +14,12 @@ interface PostCardProps {
   isLiked?: boolean;
   currentUser: User;
   isDeletingPost?: boolean
+  deletingPostId: string | null
 }
 
-export const PostCard = React.memo(({ post, onLike, isLiked, onDelete, onComment, currentUser, isDeletingPost }: PostCardProps) => {
+export const PostCard = React.memo(({ post, onLike, isLiked, onDelete, onComment, currentUser, isDeletingPost, deletingPostId }: PostCardProps) => {
   // const{}=usePosts(post?._id)
-
+  console.log(deletingPostId, 'klf')
   const isOwnPost = post.user?._id === currentUser?._id;
   console.log("rendering comment")
   const handleDelete = () => {
@@ -50,13 +51,18 @@ export const PostCard = React.memo(({ post, onLike, isLiked, onDelete, onComment
                 @{post?.user?.username} · {formatDate(post?.createdAt)}
               </Text>
             </View>
+
+            
             {isOwnPost && (
-              isDeletingPost ? <ActivityIndicator />
-                :
+              isDeletingPost && deletingPostId === post?._id ? (
+                <ActivityIndicator />
+              ) : (
                 <TouchableOpacity onPress={handleDelete}>
                   <Feather name="trash" size={20} color="#657786" />
                 </TouchableOpacity>
+              )
             )}
+
           </View>
 
           {post?.content && (
@@ -65,10 +71,11 @@ export const PostCard = React.memo(({ post, onLike, isLiked, onDelete, onComment
 
           {post?.image && (
             <Image
-              source={{ uri: post?.image }}
-              className="w-full h-48 rounded-2xl mb-3"
-              resizeMode="cover"
-            />
+                         source={{ uri: post?.image }}
+                         className="w-full h-[300px] rounded-2xl mb-3"
+                         resizeMode="stretch"
+                        //  style={{ aspectRatio: 1 }}
+                       />
           )}
 
           <View className="flex-row justify-between max-w-xs">

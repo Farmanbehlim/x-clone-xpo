@@ -3,7 +3,8 @@ import { formatDate, formatNumber } from "@/utils/formatters";
 import { AntDesign, Feather } from "@expo/vector-icons";
 import React, { memo } from "react";
 import { View, Text, Alert, Image, TouchableOpacity, ActivityIndicator } from "react-native";
-import { PostsResponse, User,PostItem } from "../../home/home-screen/types";
+import {  User, PostItem } from "../../home/home-screen/types";
+
 
 
 interface PostCardProps {
@@ -14,10 +15,11 @@ interface PostCardProps {
   isLiked?: boolean;
   currentUser: User;
   isDeletingPost?: boolean
+  deletingPostId: string | null
 }
 
-export const MainUserPostscard = React.memo(({ post, onLike, isLiked, onDelete, onComment, currentUser, isDeletingPost }: PostCardProps) => {
-
+export const MainUserPostscard = React.memo(({ post, onLike, isLiked, onDelete, onComment, currentUser, isDeletingPost, deletingPostId }: PostCardProps) => {
+  console.log(deletingPostId, 'plf')
   const isOwnPost = post.user?._id === currentUser?._id;
   console.log("rendering comment")
   const handleDelete = () => {
@@ -50,11 +52,13 @@ export const MainUserPostscard = React.memo(({ post, onLike, isLiked, onDelete, 
               </Text>
             </View>
             {isOwnPost && (
-              isDeletingPost ? <ActivityIndicator />
-                :
+              isDeletingPost && deletingPostId === post?._id ? (
+                <ActivityIndicator />
+              ) : (
                 <TouchableOpacity onPress={handleDelete}>
                   <Feather name="trash" size={20} color="#657786" />
                 </TouchableOpacity>
+              )
             )}
           </View>
 
@@ -65,9 +69,10 @@ export const MainUserPostscard = React.memo(({ post, onLike, isLiked, onDelete, 
           {post?.image && (
             <Image
               source={{ uri: post?.image }}
-              className="w-full h-48 rounded-2xl mb-3"
-              resizeMode="cover"
+              className="w-full h-[300px] rounded-2xl mb-3 "
+              resizeMode="stretch"
             />
+            
           )}
 
           <View className="flex-row justify-between max-w-xs">

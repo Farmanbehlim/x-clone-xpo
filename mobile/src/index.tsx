@@ -5,15 +5,15 @@ import "../global.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef, useState } from "react";
-
+import  Constants  from "expo-constants";
 import RootNavigator from "./navigations/root-navigator";
-import { registerForPushNotifications } from "@/utils/registerForPushNotifications";
+// import { registerForPushNotifications } from "@/utils/registerForPushNotifications";
 import { usePushTokenStore } from "./store/use-registerToken-store";
 import { NavigationContainerRef } from "@react-navigation/native";
 import { RootTabParamList } from "./navigations/type";
-import { useUserAuthStore } from "./store/use-Auth-store";
+import { registerForPushNotifications } from "../utils/registerForPushNotifications";
 const queryClient = new QueryClient();
-const PUBLISHABLE_KEY = "pk_test_Y2hhcm1pbmctcGFycm90LTk2LmNsZXJrLmFjY291bnRzLmRldiQ"
+const PUBLISHABLE_KEY = Constants?.expoConfig?.extra?.CLERK_PUBLISHABLE_KEY
 export default function App() {
   const navigationRef = useRef<NavigationContainerRef<RootTabParamList>>(null);
 

@@ -38,7 +38,7 @@ const Root = () => {
         };
          
         sendToken();
-    }, [pushToken,updateTokenInDb]);
+    }, [pushToken,updateTokenInDb,isSignedIn]);
     return (
         <Stack.Navigator
             screenOptions={{

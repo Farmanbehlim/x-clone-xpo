@@ -39,8 +39,8 @@ export const CommentsModal = React.memo(({ selectedPost, onClose }: CommentsModa
     setCommentText("");
   };
 
-  
 
+  console.log(data, 'commenteddatasj')
 
   const commentData = useMemo(() => {
     const allComments = data?.pages?.flatMap(page => page?.comments || []) || [];
@@ -136,11 +136,19 @@ export const CommentsModal = React.memo(({ selectedPost, onClose }: CommentsModa
                 )}
 
                 {selectedPost.image && (
-                  <Image
-                    source={{ uri: selectedPost.image }}
-                    className="w-full h-48 rounded-2xl mb-3"
-                    resizeMode="cover"
-                  />
+                  // <Image
+                  //   source={{ uri: selectedPost.image }}
+                  //   className="w-full h-48 rounded-2xl mb-3"
+                  //   resizeMode="cover"
+                  // />
+                  <View style={{  height: 140, overflow: "hidden" }} className="w-full mb-3 rounded-2xl" >
+                    <Image
+                      source={{ uri: selectedPost.image }}
+                      style={{  height: 320,  }}
+                     resizeMode="cover"
+                     className="w-full "
+                    />
+                  </View>
                 )}
               </View>
             </View>

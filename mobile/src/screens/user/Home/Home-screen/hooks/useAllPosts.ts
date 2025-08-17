@@ -41,6 +41,9 @@ export const useAllPosts = (
     >({
         queryKey: ['AllUserPost'],
         queryFn: fetchUsers,
+        staleTime: 60 * 1000 ,// 1 minute
+        refetchOnWindowFocus:true,
+        refetchOnReconnect:true,
         initialPageParam: 1,
         getNextPageParam: (lastPage: PostsResponse) =>
             lastPage?.pagination?.hasNextPage ? parseInt(lastPage?.pagination?.currentPage) + 1 : undefined

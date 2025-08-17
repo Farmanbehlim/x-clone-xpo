@@ -1,6 +1,17 @@
 
 import React, { useState } from 'react'
-import { FlatList, Text, TextInput, View, Image, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { 
+  FlatList, 
+  Text, 
+  TextInput, 
+  View, 
+  Image, 
+  ActivityIndicator, 
+  TouchableOpacity, 
+  SafeAreaView, 
+  Platform,
+  StatusBar 
+} from 'react-native';
 import { useInfiniteUsers } from './hooks/useSearchFollower';
 import { useDebounce } from 'use-debounce';
 import { Feather } from '@expo/vector-icons';
@@ -8,8 +19,8 @@ import { Feather } from '@expo/vector-icons';
 const SearchScreen = () => {
     const [search, setSearch] = useState('');
     const [debouncedSearch] = useDebounce(search, 500); 
-    console.log(debouncedSearch)
-    const { data,
+    const { 
+        data,
         fetchNextPage,
         hasNextPage,
         isFetchingNextPage,
@@ -18,11 +29,18 @@ const SearchScreen = () => {
         error,
         refetch,
     } = useInfiniteUsers(debouncedSearch);
+    
     const users = data?.pages.flatMap(page => page.users) ?? [];
+
     return (
-        <View className="flex-1 bg-white">
-           
-            <View className="px-4 py-7 border-b border-gray-100">
+        <SafeAreaView 
+            className="flex-1 bg-white"
+            style={{
+                paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0
+            }}
+        >
+            {/* Search Header */}
+            <View className="px-4 py-4 border-b border-gray-100">
                 <View className="flex-row items-center bg-gray-100 rounded-full px-4 py-3">
                     <Feather name="search" size={20} color="#657786" />
                     <TextInput
@@ -35,17 +53,21 @@ const SearchScreen = () => {
                 </View>
             </View>
 
+            {/* Results List */}
             {isLoading ? (
-                <ActivityIndicator size="large" />
+                <View >
+                    <ActivityIndicator size="large" />
+                </View>
             ) : isError ? (
-                <Text style={{ color: 'red' }}>{(error as Error).message}</Text>
+                <View >
+                    <Text className="text-red-500">{(error as Error).message}</Text>
+                </View>
             ) : (
                 <FlatList
                     data={users}
                     keyExtractor={(item) => item._id}
                     renderItem={({ item }) => (
-                        
-                        <TouchableOpacity className="py-3 flex-row items-center border-b border-gray-100">
+                        <TouchableOpacity className="py-3 flex-row items-center border-b border-gray-100 px-5">
                             <Image
                                 source={{ uri: item.profilePicture }}
                                 className="w-12 h-12 rounded-full mr-3"
@@ -61,16 +83,19 @@ const SearchScreen = () => {
                             fetchNextPage();
                         }
                     }}
-                    contentContainerStyle={{paddingHorizontal:20}}
                     onEndReachedThreshold={0.5}
+                    contentContainerStyle={{paddingHorizontal:5}}
                     ListFooterComponent={
-                        isFetchingNextPage ? <ActivityIndicator size="small" /> : null
+                        isFetchingNextPage ? (
+                            <View className="py-4">
+                                <ActivityIndicator size="small" />
+                            </View>
+                        ) : null
                     }
                 />
             )}
-        </View>
+        </SafeAreaView>
     );
-
 }
 
-export default SearchScreen
+export default SearchScreen;

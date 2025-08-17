@@ -1,5 +1,5 @@
 import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import { useProfile } from "../hooks/useProfile"
 import { usePosts } from "../hooks/usePosts"
@@ -9,14 +9,22 @@ import { format } from "date-fns";
 import { SignOutButton } from "./SignOutButton"
 import { Feather } from "@expo/vector-icons";
 import { EditProfileModal } from './EditProfileModal'
-export const MainUserProfile = React.memo(() => {
+import { Post, User } from '../types'
+
+interface Props {
+  currentUsers: User; // Passed from parent
+  post:Post
+} 
+export const MainUserProfile = React.memo(({currentUsers,post}:Props) => {
     const { currentUser, isLoading } = useCurrentUser();
+    console.log("th")
     const { getLocation, address, errorMsg } = useLocation()
     const {
         posts: userPosts,
         refetch: refetchPosts,
-        isLoading: isRefetching,
+        // isLoading: isRefetching,
     } = usePosts(currentUser?.username);
+
     const {
         isEditModalVisible,
         openEditModal,
@@ -30,9 +38,11 @@ export const MainUserProfile = React.memo(() => {
 
     if (isLoading) {
         return (
-            <ActivityIndicator />
-        )
+            <View></View>
+        );
     }
+
+    
     return (
         <View >
 

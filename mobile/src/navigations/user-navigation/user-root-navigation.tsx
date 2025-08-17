@@ -9,6 +9,7 @@ import SearchScreen from '@/src/screens/user/search/search-screen/search-screen'
 import {  RootTabParamList } from '../type';
 import ProfileScreens from '@/src/screens/user/profile/profile-screen/profile';
 import { HomeScreen } from '@/src/screens/user/home/home-screen/homescreen';
+// import { HomeScreen } from '@/src/screens/user/home/home-screen/Home-screen';
 
 // Create placeholder screens (replace with your actual components)
 
